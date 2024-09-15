@@ -4,27 +4,28 @@ __kernel void convolution2D(
     int width, int height, int maskWidth,  int imageChannels){
     //@@ Insert code to implement matrix multiplication here
 
-    /**
-    maskRadius := maskWidth/2 # this is integer division, so the result is 2
-    for i from 0 to height do
-    for j from 0 to width do
-        for k from 0 to channels
-        accum := 0
-        for y from -maskRadius to maskRadius do
-            for x from -maskRadius to maskRadius do
-            xOffset := j + x
-            yOffset := i + y
-            if xOffset >= 0 && xOffset < width &&
-                yOffset >= 0 && yOffset < height then
-                imagePixel := I[(yOffset * width + xOffset) * channels + k]
-                maskValue := K[(y+maskRadius)*maskWidth+x+maskRadius]
-                accum += imagePixel * maskValue
-            end
-            end
-        end
-        # pixels are in the range of 0 to 1
-        P[(i * width + j)*channels + k] = clamp(accum, 0, 1)
-        end
-    end
-    end */
+    /* channel index is 0 for R, 1 for G, and 2 for B */
+    int maskRadius = maskWidth/2;
+    int xIndex = get_global_id(0); //i in pseudo
+    int yIndex = get_global_id(1);  //j in pseudo
+    int accum, imagePixel, maskValue;
+
+    for(int k = 0; k < imageChannels; k++){
+        accum = 0;
+        for(int y = -maskRadius; y < maskRadius; y++){
+            for (int x = -maskRadius; x < maskRadius; x++){
+                int xOffset = xIndex + x;
+                int yOffset = yIndex + y;
+                if (xOffset >= 0 && xOffset < width && yOffset >= 0 && yOffset < height){
+                   imagePixel = inputData[(yOffset * width + xOffset) * imageChannels + k];
+                   maskValue = maskData[(y+maskRadius)*maskWidth+x+maskRadius];
+                   accum += imagePixel * maskValue;
+                }
+            } 
+
+        } 
+        // pixels are in the range of 0 to 1
+        outputData[(xIndex * width + yIndex)*imageChannels + k] = clamp(accum, 0, 1);
+    } 
+
 }
