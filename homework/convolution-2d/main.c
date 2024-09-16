@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     //@@ Update these values for the output rows and cols of the output
     //@@ Do not use the results from the answer image
     rows = host_a.shape[0];
-    cols = host_b.shape[1];
+    cols = host_a.shape[1];
     
     // Allocate the memory for the target.
     host_c.shape[0] = rows;

@@ -5,6 +5,7 @@ __kernel void convolution2D(
     //@@ Insert code to implement matrix multiplication here
 
     /* channel index is 0 for R, 1 for G, and 2 for B */
+
     int maskRadius = maskWidth/2;
     int xIndex = get_global_id(0); //i in pseudo
     int yIndex = get_global_id(1);  //j in pseudo
@@ -15,8 +16,8 @@ __kernel void convolution2D(
             accum = 0;
             for(int y = -maskRadius; y <= maskRadius; y++){
                 for (int x = -maskRadius; x <= maskRadius; x++){
-                    int xOffset = xIndex + x;
-                    int yOffset = yIndex + y;
+                    int xOffset = yIndex + x;
+                    int yOffset = xIndex + y;
                     if (xOffset >= 0 && xOffset < width && yOffset >= 0 && yOffset < height){
                         imagePixel = inputData[(yOffset * width + xOffset) * imageChannels + k];
                         maskValue = maskData[(y+maskRadius)*maskWidth+x+maskRadius];
@@ -28,6 +29,6 @@ __kernel void convolution2D(
         // pixels are in the range of 0 to 1
         outputData[(xIndex * width + yIndex)*imageChannels + k] = clamp(accum, 0.0f, 1.0f);
         }
-    } 
+    }
 
 }
